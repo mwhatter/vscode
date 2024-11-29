@@ -19,7 +19,7 @@ import { ChatAgentLocation } from '../../common/chatAgents.js';
 import { IBaseChatRequestVariableEntry, IChatRequestImplicitVariableEntry } from '../../common/chatModel.js';
 import { ILanguageModelIgnoredFilesService } from '../../common/ignoredFiles.js';
 import { IChatWidget, IChatWidgetService } from '../chat.js';
-import { PromptFileReference } from '../../common/promptFileReference.js';
+import { FilePromptParser } from '../../common/promptFileReference.js';
 import { IInstantiationService } from '../../../../../platform/instantiation/common/instantiation.js';
 
 export class ChatImplicitContextContribution extends Disposable implements IWorkbenchContribution {
@@ -132,7 +132,7 @@ export class ChatImplicitContext extends Disposable implements IChatRequestImpli
 	 * Chat reference object for the current implicit context `URI`
 	 * allows to resolve nested file references(aka `prompt snippets`).
 	 */
-	private promptFileReference?: PromptFileReference;
+	private promptFileReference?: FilePromptParser;
 
 	constructor(
 		@IInstantiationService private readonly instantiationService: IInstantiationService,
@@ -220,7 +220,7 @@ export class ChatImplicitContext extends Disposable implements IChatRequestImpli
 	 */
 	setValue(value: Location | URI | undefined, isSelection: boolean) {
 		// if the `prompt-snippets` feature is enabled, add a chat reference object
-		if (PromptFileReference.promptSnippetsEnabled(this.configService)) {
+		if (FilePromptParser.promptSnippetsEnabled(this.configService)) {
 			this.addPromptFileReferenceFor(value);
 		}
 
@@ -240,22 +240,24 @@ export class ChatImplicitContext extends Disposable implements IChatRequestImpli
 			return this.removePromptFileReference();
 		}
 
+		const valueUri = URI.isUri(value) ? value : value.uri;
+
 		// if the `URI` value didn't change and prompt file reference exists, nothing to do
-		if (this.promptFileReference && this.promptFileReference.sameUri(value)) {
+		if (this.promptFileReference && this.promptFileReference.sameUri(valueUri)) {
 			return;
 		}
 
 		// got a new `URI` value, so remove the existing prompt file
 		// reference object(if present) and create a new one
 		this.removePromptFileReference();
-		this.promptFileReference = this.instantiationService.createInstance(PromptFileReference, value);
+		this.promptFileReference = this.instantiationService.createInstance(FilePromptParser, valueUri, []);
 
 		// subscribe to updates of the prompt file reference
 		this.promptFileReference.onUpdate(
 			this._onDidChangeValue.fire.bind(this._onDidChangeValue),
 		);
 		// start resolving the nested prompt file references immediately
-		this.promptFileReference.resolve();
+		this.promptFileReference.start();
 	}
 
 	/**
