@@ -76,7 +76,7 @@ export class ChatDynamicVariableModel extends Disposable implements IChatWidgetC
 						}
 
 						// dispose the reference if possible before dropping it off
-						if ('dispose' in ref) {
+						if ('dispose' in ref && typeof ref.dispose === 'function') {
 							ref.dispose();
 						}
 

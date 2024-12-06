@@ -20,7 +20,7 @@ import { IBaseChatRequestVariableEntry, IChatRequestImplicitVariableEntry } from
 import { ILanguageModelIgnoredFilesService } from '../../common/ignoredFiles.js';
 import { IChatWidget, IChatWidgetService } from '../chat.js';
 import { IInstantiationService } from '../../../../../platform/instantiation/common/instantiation.js';
-import { FilePromptParser } from '../../common/filePromptParser.js';
+import { FilePromptParser } from '../../common/promptFileReference.js';
 
 export class ChatImplicitContextContribution extends Disposable implements IWorkbenchContribution {
 	static readonly ID = 'chat.implicitContext';
