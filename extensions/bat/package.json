@@ -9,8 +9,10 @@
     "vscode": "^1.52.0"
   },
   "scripts": {
-    "update-grammar": "node ../node_modules/vscode-grammar-updater/bin mmims/language-batchfile grammars/batchfile.cson ./syntaxes/batchfile.tmLanguage.json"
+    "update-grammar": "node ../node_modules/vscode-grammar-updater/bin mmims/language-batchfile grammars/batchfile.cson ./syntaxes/batchfile.tmLanguage.json",
+    "build": "cargo build --release"
   },
+  "main": "./target/release/bat",
   "categories": ["Programming Languages"],
   "contributes": {
     "languages": [
